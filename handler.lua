@@ -12,19 +12,13 @@ local JwtHandler = BasePlugin:extend()
 JwtHandler.PRIORITY = 1000
 
 --- Retrieve a JWT in a request.
--- Checks for the JWT in URI parameters, then in the `Authorization` header.
+-- Checks for the JWT in the `Authorization` header.
 -- @param request ngx request object
 -- @param conf Plugin configuration
 -- @return token JWT token contained in request or nil
 -- @return err
 local function retrieve_token(request, conf)
   local uri_parameters = request.get_uri_args()
-
-  for _, v in ipairs(conf.uri_param_names) do
-    if uri_parameters[v] then
-      return uri_parameters[v]
-    end
-  end
 
   local authorization_header = request.get_headers()["authorization"]
   if authorization_header then
@@ -72,7 +66,7 @@ function JwtHandler:access(conf)
     return responses.send_HTTP_UNAUTHORIZED("No mandatory '"..conf.key_claim_name.."' in claims")
   end
 
-  jwt_secret_value = "__GEHEIM"
+  jwt_secret_value = conf.jwt_secret
 
   -- Now verify the JWT signature
   if not jwt:verify_signature(jwt_secret_value) then
@@ -84,7 +78,7 @@ function JwtHandler:access(conf)
   if not ok_claims then
     return responses.send_HTTP_FORBIDDEN(errors)
   end
-  
+
 end
 
 return JwtHandler
