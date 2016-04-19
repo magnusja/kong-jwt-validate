@@ -59,13 +59,6 @@ function JwtHandler:access(conf)
     return responses.send_HTTP_INTERNAL_SERVER_ERROR()
   end
 
-  local claims = jwt.claims
-
-  local jwt_secret_key = claims[conf.key_claim_name]
-  if not jwt_secret_key then
-    return responses.send_HTTP_UNAUTHORIZED("No mandatory '"..conf.key_claim_name.."' in claims")
-  end
-
   jwt_secret_value = conf.jwt_secret
 
   -- Now verify the JWT signature
