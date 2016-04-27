@@ -66,11 +66,7 @@ function JwtHandler:access(conf)
     return responses.send_HTTP_FORBIDDEN("Invalid signature")
   end
 
-  -- Verify the JWT registered claims
-  local ok_claims, errors = jwt:verify_registered_claims(conf.claims_to_verify)
-  if not ok_claims then
-    return responses.send_HTTP_FORBIDDEN(errors)
-  end
+  ngx.req.set_header("X-User-UUID", jwt.claims.uuid)
 
 end
 
